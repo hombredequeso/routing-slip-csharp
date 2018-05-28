@@ -20,12 +20,17 @@ namespace RoutingSlipTests
         
         public Task<Option<ITransportCommand<TestCommand, TestMetadata, string>>> GetNextTransportCommand()
         {
-            var nextCmd = 
+            Option<ITransportCommand<TestCommand, TestMetadata, string>> nextCmd = 
                 _commands
                     .Where(c => !c.Value.Item2)
                     .Select(c => c.Value.Item1)
                     .Cast<ITransportCommand<TestCommand, TestMetadata, string>>()
                     .FirstOrNone();
+            // Pop this route off.
+            foreach (var cmd in nextCmd)
+            {
+                cmd.Metadata.RoutingSlip.Next();
+            }
             return Task.FromResult(nextCmd);
         }
 

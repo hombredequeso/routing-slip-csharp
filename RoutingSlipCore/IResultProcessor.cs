@@ -4,6 +4,6 @@ namespace Hdq.Routingslip.Core
 {
     public interface IResultProcessor<TResult>
     {
-        Task<bool> Process(TResult result);
+        Task Process(TResult result);
     }
 }

@@ -36,8 +36,8 @@ namespace Hdq.Routingslip.Core
         public async Task<bool> ProcessCommand(ITransportCommand<TCmd, TMetadata, TRoute> cmd)
         {
             TResult result = await _commandHandler.Handle(cmd);
-            bool processResult = await _resultProcessor.Process(result);
-            bool forwardResult = await _router.ForwardCommand(cmd);
+            await _resultProcessor.Process(result);
+            await _router.ForwardCommand(cmd);
             bool ackResult = await _commandSource.AckTransportCommand(cmd);
             return ackResult;
         }

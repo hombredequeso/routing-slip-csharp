@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Hdq.Routingslip.Core;
 using Optional;
+using Optional.Collections;
 
 namespace RoutingSlipTests
 {
@@ -9,15 +10,16 @@ namespace RoutingSlipTests
     {
         public Tuple<ITransportCommand<TestCommand, TestMetadata, string>, string> Forwarded { get; private set; }
         
-        public Task<bool> ForwardCommand(
+        public Task ForwardCommand(
             ITransportCommand<TestCommand, TestMetadata, string> transportCommand)
         {
-            Option<string> nextRoute = transportCommand.Metadata.RoutingSlip.Next();
+
+            Option<string> nextRoute = transportCommand.Metadata.RoutingSlip.RemainingRoutes().FirstOrNone();
             foreach (var route in nextRoute)
             {
                 Forwarded = Tuple.Create(transportCommand, route);
             }
-            return Task.FromResult(true);
+            return Task.CompletedTask;
         }
     }
 }

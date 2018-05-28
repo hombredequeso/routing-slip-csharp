@@ -30,12 +30,21 @@ namespace RoutingSlipTests
                     router,
                     "route1");
                    
+            // Act
             Option<bool> result = await processor.Run();
+            
+            // Assert
             result.Should().Be(Option.Some(true));
             var firstCorrelationId = testTransportCommands.First().Metadata.CorrelationId;
             resultProcessor.TestResult.Should().BeEquivalentTo(new TestResult(firstCorrelationId));
-            router.Forwarded.Should().BeEquivalentTo(
-                Tuple.Create(testTransportCommands.First(), "route1"));
+
+            var forwarded = router.Forwarded;
+            string forwardedroute = forwarded.Item2;
+            forwardedroute.Should().BeEquivalentTo("route2");
+
+            var forwardedMessage = forwarded.Item1;
+            var expectedMessage = testTransportCommands.First();
+            forwardedMessage.Should().BeEquivalentTo(expectedMessage);
         }
     }
 }
