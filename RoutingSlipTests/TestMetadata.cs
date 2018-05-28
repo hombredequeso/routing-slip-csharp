@@ -1,4 +1,5 @@
 ﻿using System;
+using Hdq.Routingslip.Core;
 
 namespace RoutingSlipTests
 {

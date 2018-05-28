@@ -1,4 +1,6 @@
-﻿namespace RoutingSlipTests
+﻿using Hdq.Routingslip.Core;
+
+namespace RoutingSlipTests
 {
     public class TestTransportCommand : 
         ITransportCommand<TestCommand, TestMetadata, string>

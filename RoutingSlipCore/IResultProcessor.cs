@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace RoutingSlipTests
+namespace Hdq.Routingslip.Core
 {
     public interface IResultProcessor<TResult>
     {

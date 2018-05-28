@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Optional;
 
-namespace RoutingSlipTests
+namespace Hdq.Routingslip.Core
 {
     public interface ICommandSource<TCmd, TMetadata, TRoute> where TMetadata : IMetadata<TRoute>
     {

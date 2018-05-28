@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace RoutingSlipTests
+namespace Hdq.Routingslip.Core
 {
     public interface IRouter<TCmd, TMetadata, TRoute> where TMetadata : IMetadata<TRoute>
     {

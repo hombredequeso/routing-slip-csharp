@@ -1,4 +1,4 @@
-﻿namespace RoutingSlipTests
+﻿namespace Hdq.Routingslip.Core
 {
     public interface ITransportCommand<TCmd, TMetadata, TRoute> where TMetadata: IMetadata<TRoute>
     {

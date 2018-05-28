@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Optional;
 
-namespace RoutingSlipTests
+namespace Hdq.Routingslip.Core
 {
     public class RoutingSlip<TRoute>
     {

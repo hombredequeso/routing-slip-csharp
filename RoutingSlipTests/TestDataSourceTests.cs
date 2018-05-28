@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using Hdq.Routingslip.Core;
 using Optional;
 using Optional.Unsafe;
 using Xunit;

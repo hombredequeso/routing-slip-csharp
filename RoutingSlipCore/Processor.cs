@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Optional;
 
-namespace RoutingSlipTests
+namespace Hdq.Routingslip.Core
 {
     public class Processor<TCmd, TMetadata, TRoute, TResult> where TMetadata : IMetadata<TRoute>
     {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Optional;
 
-namespace RoutingSlipTests
+namespace Hdq.Routingslip.Core
 {
     public static class OptionTaskExtensions
     {
