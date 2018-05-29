@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Hdq.Routingslip.Core.Aws
 {
@@ -6,16 +7,20 @@ namespace Hdq.Routingslip.Core.Aws
     {
         private readonly string _queueName;
 
-        private readonly int minLength = 5;
-        private readonly int maxLength = 300;
-        public static readonly string lowercaseDigitsAndDashRegex = "^[a-z\\d-]+$";
+        private const int minLength = 5;
+        private const int maxLength = 100;
+        
+        public static readonly string lowercaseDigitsAndDashRegex = 
+            // start-of-string [ lowercase digits - ] {allow between minLength and maxLength} end-of-string
+            String.Format("^[a-z\\d-]{{{0},{1}}}$", minLength, maxLength);
+        private static readonly string regexErrorMessage =
+            "Invalid queueName. Only 5-100 lowercase, numeric, and - characters allowed";
 
         public SqsRoute(string queueName)
         {
             if (queueName == null) throw new ArgumentNullException(nameof(queueName));
-            if (queueName.Length < minLength || queueName.Length > maxLength)
-                throw new ArgumentException("Invalid length", nameof(queueName));
-            // check for valid characters.
+            if (!new Regex(lowercaseDigitsAndDashRegex).IsMatch(queueName))
+                throw new ArgumentException( regexErrorMessage, nameof(queueName));
             
             _queueName = queueName;
         }
