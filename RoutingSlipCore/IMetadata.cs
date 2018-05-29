@@ -1,7 +1,9 @@
-﻿namespace Hdq.Routingslip.Core
+﻿using System.Collections.Generic;
+
+namespace Hdq.Routingslip.Core
 {
     public interface IMetadata<TRoute>
     {
-        RoutingSlip<TRoute> RoutingSlip { get; }
+        List<TRoute> RoutingSlip { get; }
     }
 }

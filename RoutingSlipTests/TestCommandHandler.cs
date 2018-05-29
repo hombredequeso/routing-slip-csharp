@@ -1,14 +1,17 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Hdq.Routingslip.Core;
 
 namespace RoutingSlipTests
 {
-    public class TestCommandHandler : ICommandHandler<TestCommand, TestMetadata, string, TestResult>
+    public class TestCommandHandler : ICommandHandler<TestCommand, TestCommand, TestMetadata, string, TestResult>
     {
-        public Task<TestResult> Handle(ITransportCommand<TestCommand, TestMetadata, string> cmd)
+        public Task<Tuple<TestResult, ITransportCommand<TestCommand, TestMetadata, string>>> Handle(
+            ITransportCommand<TestCommand, TestMetadata, string> cmd)
         {
-            return Task.FromResult(
-                new TestResult(cmd.Metadata.CorrelationId));
+            var testResult = new TestResult(cmd.Metadata.CorrelationId);
+            var nextCmd = cmd;
+            return Task.FromResult(Tuple.Create(testResult, nextCmd));
         }
     }
 }

@@ -14,11 +14,26 @@ namespace RoutingSlipTests
         public TestDataSource(IEnumerable<TestTransportCommand> cmds)
         {
             _commands = cmds
-                .Select(c => Tuple.Create<TestTransportCommand, bool>(c, false))
+                .Select(c => Tuple.Create(c, false))
                 .ToDictionary(x => x.Item1.Metadata.CorrelationId);
         }
-        
-        public Task<Option<ITransportCommand<TestCommand, TestMetadata, string>>> GetNextTransportCommand()
+
+        public static ITransportCommand<TestCommand, TestMetadata, string> GetNext(
+            ITransportCommand<TestCommand, TestMetadata, string> t)
+        {
+            return new TestTransportCommand(t.DomainCommand, NextMetadata(t.Metadata));
+        }
+
+        public static TestMetadata NextMetadata(
+            TestMetadata t)
+        {
+            var ht = t.RoutingSlip.HeadAndTail();
+            var newMetadata = new TestMetadata(t.CorrelationId, ht.Item2);
+            return newMetadata;
+        }
+
+        public Task<Option<ITransportCommand<TestCommand, TestMetadata, string>>> 
+            GetNextTransportCommand()
         {
             Option<ITransportCommand<TestCommand, TestMetadata, string>> nextCmd = 
                 _commands
@@ -26,12 +41,9 @@ namespace RoutingSlipTests
                     .Select(c => c.Value.Item1)
                     .Cast<ITransportCommand<TestCommand, TestMetadata, string>>()
                     .FirstOrNone();
-            // Pop this route off.
-            foreach (var cmd in nextCmd)
-            {
-                cmd.Metadata.RoutingSlip.Next();
-            }
-            return Task.FromResult(nextCmd);
+
+            var nextCmd2 = nextCmd.Map(GetNext);
+            return Task.FromResult(nextCmd2);
         }
 
         public Task<bool> AckTransportCommand(

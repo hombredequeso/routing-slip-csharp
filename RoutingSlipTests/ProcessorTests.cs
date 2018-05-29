@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Hdq.Routingslip.Core;
@@ -13,17 +14,17 @@ namespace RoutingSlipTests
         [Fact]
         public async void End_to_end_processor_test()
         {
-            var testTransportCommands = TestFactory.GetTestCommands(10);
+            List<TestTransportCommand> testTransportCommands = TestFactory.GetTestCommands(10);
             ICommandSource<TestCommand, TestMetadata, string> commandSource = 
                 new TestDataSource(testTransportCommands);
-            ICommandHandler<TestCommand, TestMetadata, string, TestResult> commandHandler = 
+            ICommandHandler<TestCommand, TestCommand, TestMetadata, string, TestResult> commandHandler = 
                 new TestCommandHandler();
             var resultProcessor
                 = new TestResultProcessor();
             var router = new TestRouter();
             
-            Processor<TestCommand, TestMetadata, TestRoute, TestResult> processor =
-                new Processor<TestCommand, TestMetadata, TestRoute, TestResult>(
+            Processor<TestCommand, TestCommand, TestMetadata, TestRoute, TestResult> processor =
+                new Processor<TestCommand, TestCommand, TestMetadata, TestRoute, TestResult>(
                     commandSource,
                     commandHandler,
                     resultProcessor,
@@ -43,8 +44,8 @@ namespace RoutingSlipTests
             forwardedroute.Should().BeEquivalentTo("route2");
 
             var forwardedMessage = forwarded.Item1;
-            var expectedMessage = testTransportCommands.First();
-            forwardedMessage.Should().BeEquivalentTo(expectedMessage);
+            var expectedMd = TestDataSource.GetNext(testTransportCommands.First());
+            forwardedMessage.Should().BeEquivalentTo(expectedMd);
         }
     }
 }

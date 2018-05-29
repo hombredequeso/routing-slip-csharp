@@ -1,21 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Optional;
 
 namespace Hdq.Routingslip.Core
 {
-    public class Processor<TCmd, TMetadata, TRoute, TResult> where TMetadata : IMetadata<TRoute>
+    public class Processor<TCmd, TNextCmd, TMetadata, TRoute, TResult> where TMetadata : IMetadata<TRoute>
     {
         private readonly ICommandSource<TCmd, TMetadata, TRoute> _commandSource;
-        private readonly ICommandHandler<TCmd, TMetadata, TRoute, TResult> _commandHandler;
+        private readonly ICommandHandler<TCmd, TNextCmd, TMetadata, TRoute, TResult> _commandHandler;
         private readonly IResultProcessor<TResult> _resultProcessor;
-        private readonly IRouter<TCmd, TMetadata, TRoute> _router;
+        private readonly IRouter<TNextCmd, TMetadata, TRoute> _router;
         private readonly TRoute _thisRoute;
 
         public Processor(
             ICommandSource<TCmd, TMetadata, TRoute> commandSource, 
-            ICommandHandler<TCmd, TMetadata, TRoute, TResult> commandHandler, 
+            ICommandHandler<TCmd, TNextCmd, TMetadata, TRoute, TResult> commandHandler, 
             IResultProcessor<TResult> resultProcessor, 
-            IRouter<TCmd, TMetadata, TRoute> router, 
+            IRouter<TNextCmd, TMetadata, TRoute> router, 
             TRoute thisRoute)
         {
             _commandSource = commandSource;
@@ -35,9 +36,12 @@ namespace Hdq.Routingslip.Core
 
         public async Task<bool> ProcessCommand(ITransportCommand<TCmd, TMetadata, TRoute> cmd)
         {
-            TResult result = await _commandHandler.Handle(cmd);
+            Tuple<TResult, ITransportCommand<TNextCmd, TMetadata, TRoute>> handlerResult = 
+                await _commandHandler.Handle(cmd);
+            var result = handlerResult.Item1;
+            ITransportCommand<TNextCmd, TMetadata, TRoute> nextCmd = handlerResult.Item2;
             await _resultProcessor.Process(result);
-            await _router.ForwardCommand(cmd);
+            await _router.ForwardCommand(nextCmd);
             bool ackResult = await _commandSource.AckTransportCommand(cmd);
             return ackResult;
         }

@@ -5,6 +5,27 @@ using Optional;
 
 namespace Hdq.Routingslip.Core
 {
+    public static class ListExtensions
+    {
+        public static Tuple<T, List<T>> HeadAndTail<T>(this List<T> l)
+        {
+            return Tuple.Create(l.First(), l.Skip(1).ToList());
+        }
+
+        public static Option<Tuple<T, List<T>>> HeadAndTailOption<T>(this List<T> l)
+        {
+            return l.Any() ? 
+                Option.Some(HeadAndTail(l)) 
+                : Option.None<Tuple<T, List<T>>>();
+        }
+
+        public static Option<T> Head<T>(this List<T> l)
+        {
+            return l.Any()
+                ? Option.Some(l.First())
+                : Option.None<T>();
+        }
+    }
     public class RoutingSlip<TRoute>
     {
         private readonly Stack<TRoute> _routes;

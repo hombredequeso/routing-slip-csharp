@@ -13,7 +13,7 @@ namespace RoutingSlipTests
     {
         public static List<TestTransportCommand> GetTestCommands(int count)
         {
-            var routingSlip = new RoutingSlip<string>(new []{"route1", "route2"});
+            var routingSlip = new List<String> {"route1", "route2"};
             return Enumerable.Range(0, count)
                 .Select(i => new TestTransportCommand(
                     new TestCommand(Guid.NewGuid()),
@@ -43,8 +43,21 @@ namespace RoutingSlipTests
             var firstCommand = await testDataSource.GetNextTransportCommand();
             var messageId = firstCommand.ValueOrFailure().DomainCommand.Id;
             var expectedId = cmds.First().DomainCommand.Id;
-
             messageId.Should().Be(expectedId);
+        }
+
+        [Fact]
+        public void NextMetadata_RemovesRoutingSlipHead()
+        {
+            var id = Guid.NewGuid();
+            var initialRoutingSlip = Enumerable.Range(0, 10).Select(x => x.ToString()).ToList();
+            var expectedRoutingSlip = initialRoutingSlip.Skip(1).ToList();
+            
+            var initialMetadata = new TestMetadata(id, initialRoutingSlip);
+            var expectedMetadata = new TestMetadata(id, expectedRoutingSlip);
+            
+            var result = TestDataSource.NextMetadata(initialMetadata);
+            result.Should().BeEquivalentTo(expectedMetadata);
         }
     }
 }

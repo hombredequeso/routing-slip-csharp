@@ -1,18 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Hdq.Routingslip.Core;
 
 namespace RoutingSlipTests
 {
     public class TestMetadata : IMetadata<string>
     {
-
-        public TestMetadata(Guid correlationId, RoutingSlip<string> routingSlip)
+        public TestMetadata(Guid correlationId, List<string> routingSlip)
         {
             CorrelationId = correlationId;
-            RoutingSlip = routingSlip;
+            _routingSlip = routingSlip;
         }
 
-        public RoutingSlip<string> RoutingSlip { get; }
+        public List<string> RoutingSlip => _routingSlip.ToList();
+
         public readonly Guid CorrelationId;
+        private readonly List<string> _routingSlip;
     }
 }

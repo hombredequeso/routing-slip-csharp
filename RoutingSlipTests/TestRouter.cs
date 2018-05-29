@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hdq.Routingslip.Core;
 using Optional;
@@ -13,9 +14,7 @@ namespace RoutingSlipTests
         public Task ForwardCommand(
             ITransportCommand<TestCommand, TestMetadata, string> transportCommand)
         {
-
-            Option<string> nextRoute = transportCommand.Metadata.RoutingSlip.RemainingRoutes().FirstOrNone();
-            foreach (var route in nextRoute)
+            foreach (var route in transportCommand.Metadata.RoutingSlip.Head())
             {
                 Forwarded = Tuple.Create(transportCommand, route);
             }
