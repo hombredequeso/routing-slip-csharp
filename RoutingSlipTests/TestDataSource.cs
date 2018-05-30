@@ -42,8 +42,10 @@ namespace RoutingSlipTests
                     .Cast<ITransportCommand<TestCommand, TestMetadata, string>>()
                     .FirstOrNone();
 
-            var nextCmd2 = nextCmd.Map(GetNext);
-            return Task.FromResult(nextCmd2);
+//            Option<ITransportCommand<TestCommand, TestMetadata, string>> nextCmd2 = 
+//                nextCmd.Map(GetNext);
+            
+            return Task.FromResult(nextCmd);
         }
 
         public Task<bool> AckTransportCommand(
@@ -53,6 +55,13 @@ namespace RoutingSlipTests
             var x = _commands[cmd.Metadata.CorrelationId];
             _commands[cmd.Metadata.CorrelationId] = Tuple.Create(x.Item1, true);
             return Task.FromResult(true);
+        }
+
+        public ITransportCommand<TestCommand, TestMetadata, string> CloneWithoutThisRoute(
+            string route, 
+            ITransportCommand<TestCommand, TestMetadata, string> cmd)
+        {
+            return GetNext(cmd);
         }
     }
 }

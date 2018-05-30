@@ -4,7 +4,8 @@ using Optional;
 
 namespace Hdq.Routingslip.Core
 {
-    public class Processor<TCmd, TNextCmd, TMetadata, TRoute, TResult> where TMetadata : IMetadata<TRoute>
+    public class Processor<TCmd, TNextCmd, TMetadata, TRoute, TResult> 
+        where TMetadata : IMetadata<TRoute>
     {
         private readonly ICommandSource<TCmd, TMetadata, TRoute> _commandSource;
         private readonly ICommandHandler<TCmd, TNextCmd, TMetadata, TRoute, TResult> _commandHandler;
@@ -30,20 +31,26 @@ namespace Hdq.Routingslip.Core
         {
             Option<ITransportCommand<TCmd, TMetadata, TRoute>> cmd = 
                 await _commandSource.GetNextTransportCommand();
-            var result = await cmd.MapAsync(ProcessCommand);
-            return result;
+            
+            Option<ITransportCommand<TCmd, TMetadata, TRoute>> cmdToProcess =
+                cmd.Map(c => _commandSource.CloneWithoutThisRoute(_thisRoute, c));
+            
+            foreach (ITransportCommand<TCmd, TMetadata, TRoute> c in cmdToProcess)
+            {
+                await ProcessCommand(c);
+            }
+            Option<bool> ackResult = await cmd.MapAsync(_commandSource.AckTransportCommand);
+            return ackResult;
         }
 
-        public async Task<bool> ProcessCommand(ITransportCommand<TCmd, TMetadata, TRoute> cmd)
+        public async Task ProcessCommand(ITransportCommand<TCmd, TMetadata, TRoute> cmd)
         {
             Tuple<TResult, ITransportCommand<TNextCmd, TMetadata, TRoute>> handlerResult = 
                 await _commandHandler.Handle(cmd);
             var result = handlerResult.Item1;
             ITransportCommand<TNextCmd, TMetadata, TRoute> nextCmd = handlerResult.Item2;
             await _resultProcessor.Process(result);
-            await _router.ForwardCommand(nextCmd);
-            bool ackResult = await _commandSource.AckTransportCommand(cmd);
-            return ackResult;
+            _router.ForwardCommand(nextCmd);
         }
     }
 }

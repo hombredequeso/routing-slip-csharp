@@ -4,6 +4,7 @@
     <RootNamespace>Hdq.Routingslip.Core</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Optional" Version="4.0.0" />
   </ItemGroup>
 </Project>
