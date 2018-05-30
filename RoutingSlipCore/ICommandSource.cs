@@ -8,8 +8,5 @@ namespace Hdq.Routingslip.Core
         Task<Option<ITransportCommand<TCmd, TMetadata, TRoute>>> GetNextTransportCommand();
         Task<bool> AckTransportCommand(ITransportCommand<TCmd, TMetadata, TRoute> cmd);
         
-        ITransportCommand<TCmd, TMetadata, TRoute> CloneWithoutThisRoute(
-            TRoute route,
-            ITransportCommand<TCmd, TMetadata, TRoute> cmd);
     }
 }

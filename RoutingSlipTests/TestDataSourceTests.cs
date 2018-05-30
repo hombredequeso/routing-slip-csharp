@@ -46,18 +46,5 @@ namespace RoutingSlipTests
             messageId.Should().Be(expectedId);
         }
 
-        [Fact]
-        public void NextMetadata_RemovesRoutingSlipHead()
-        {
-            var id = Guid.NewGuid();
-            var initialRoutingSlip = Enumerable.Range(0, 10).Select(x => x.ToString()).ToList();
-            var expectedRoutingSlip = initialRoutingSlip.Skip(1).ToList();
-            
-            var initialMetadata = new TestMetadata(id, initialRoutingSlip);
-            var expectedMetadata = new TestMetadata(id, expectedRoutingSlip);
-            
-            var result = TestDataSource.NextMetadata(initialMetadata);
-            result.Should().BeEquivalentTo(expectedMetadata);
-        }
     }
 }

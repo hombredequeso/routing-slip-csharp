@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -10,7 +11,7 @@ namespace Hdq.Routingslip.Core.Aws
     
     public class TestSqsMetadata: IMetadata<string>
     {
-        private readonly JObject _metadata;
+        public readonly JObject Metadata;
         private readonly List<string> _routingSlip;
 
         public TestSqsMetadata(JObject metadata)
@@ -18,7 +19,7 @@ namespace Hdq.Routingslip.Core.Aws
             _routingSlip = ((JArray) (metadata["routingslip"]))
                 .Select(c => (string)c)
                 .ToList();
-            _metadata = metadata;
+            Metadata = metadata;
         }
 
         public List<string> RoutingSlip => _routingSlip.ToList();
@@ -27,7 +28,49 @@ namespace Hdq.Routingslip.Core.Aws
     public class SqsTransportCommand
         : ITransportCommand<TestSqsCommand, TestSqsMetadata, string>
     {
+        public SqsTransportCommand(
+            TestSqsCommand domainCommand, 
+            TestSqsMetadata metadata)
+        {
+            DomainCommand = domainCommand;
+            Metadata = metadata;
+        }
+
         public TestSqsCommand DomainCommand { get; }
         public TestSqsMetadata Metadata { get; }
+    }
+
+    public static class SqsTransportCommandFactory
+    {
+        public static List<string> ToList(JArray ja)
+        {
+            return ToList(ja, x => (string)x);
+        }
+
+        public static List<T> ToList<T>(JArray ja, Func<JToken, T> toJToken)
+        {
+            return ja.Select(toJToken).ToList();
+        }
+        
+        public static JArray ToJArray(List<string> l)
+        {
+            return new JArray(
+                from s in l
+                select new JValue(s));
+        }
+
+        public static SqsTransportCommand CloneWithPoppedRoute(
+            string thisRoute, 
+            SqsTransportCommand cmd)
+        {
+            JObject newMetadata = (JObject)cmd.Metadata.Metadata.DeepClone();
+            List<string> route = cmd.Metadata.RoutingSlip;
+            List<string> routeTail = route.Skip(1).ToList();
+            newMetadata["routingslip"] = ToJArray(routeTail);
+            var newmetadataObject = new TestSqsMetadata(newMetadata);
+            return new SqsTransportCommand(
+                cmd.DomainCommand, 
+                newmetadataObject);
+        }
     }
 }

@@ -18,19 +18,6 @@ namespace RoutingSlipTests
                 .ToDictionary(x => x.Item1.Metadata.CorrelationId);
         }
 
-        public static ITransportCommand<TestCommand, TestMetadata, string> GetNext(
-            ITransportCommand<TestCommand, TestMetadata, string> t)
-        {
-            return new TestTransportCommand(t.DomainCommand, NextMetadata(t.Metadata));
-        }
-
-        public static TestMetadata NextMetadata(
-            TestMetadata t)
-        {
-            var ht = t.RoutingSlip.HeadAndTail();
-            var newMetadata = new TestMetadata(t.CorrelationId, ht.Item2);
-            return newMetadata;
-        }
 
         public Task<Option<ITransportCommand<TestCommand, TestMetadata, string>>> 
             GetNextTransportCommand()
@@ -42,9 +29,6 @@ namespace RoutingSlipTests
                     .Cast<ITransportCommand<TestCommand, TestMetadata, string>>()
                     .FirstOrNone();
 
-//            Option<ITransportCommand<TestCommand, TestMetadata, string>> nextCmd2 = 
-//                nextCmd.Map(GetNext);
-            
             return Task.FromResult(nextCmd);
         }
 
@@ -57,11 +41,5 @@ namespace RoutingSlipTests
             return Task.FromResult(true);
         }
 
-        public ITransportCommand<TestCommand, TestMetadata, string> CloneWithoutThisRoute(
-            string route, 
-            ITransportCommand<TestCommand, TestMetadata, string> cmd)
-        {
-            return GetNext(cmd);
-        }
     }
 }

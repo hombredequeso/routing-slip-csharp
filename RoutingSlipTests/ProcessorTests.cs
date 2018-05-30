@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Hdq.Routingslip.Core;
 using Optional;
+using Optional.Unsafe;
 using Xunit;
 using TestRoute = System.String;
 
@@ -22,6 +23,7 @@ namespace RoutingSlipTests
             var resultProcessor
                 = new TestResultProcessor();
             var router = new TestRouter();
+            var commandFactory = new TestCommandFactory();
             
             Processor<TestCommand, TestCommand, TestMetadata, TestRoute, TestResult> processor =
                 new Processor<TestCommand, TestCommand, TestMetadata, TestRoute, TestResult>(
@@ -29,14 +31,20 @@ namespace RoutingSlipTests
                     commandHandler,
                     resultProcessor,
                     router,
-                    "route1");
+                    "route1",
+                    commandFactory);
                    
             // Act
-            Option<bool> result = await processor.Run();
+            Option<Tuple<ITransportCommand<TestCommand, TestMetadata, string>, TestResult>> result = 
+                await processor.Run();
             
             // Assert
-            result.Should().Be(Option.Some(true));
             var firstCorrelationId = testTransportCommands.First().Metadata.CorrelationId;
+            result.ValueOrFailure().Item2.Should().BeEquivalentTo(
+                new TestResult(firstCorrelationId));
+            result.ValueOrFailure().Item1.Should().BeEquivalentTo(
+                testTransportCommands.First());
+            
             resultProcessor.TestResult.Should().BeEquivalentTo(new TestResult(firstCorrelationId));
 
             var forwarded = router.Forwarded;
@@ -44,7 +52,7 @@ namespace RoutingSlipTests
             forwardedroute.Should().BeEquivalentTo("route2");
 
             var forwardedMessage = forwarded.Item1;
-            var expectedMd = TestDataSource.GetNext(testTransportCommands.First());
+            var expectedMd = TestCommandFactory.GetNext("route1", testTransportCommands.First());
             forwardedMessage.Should().BeEquivalentTo(expectedMd);
         }
     }

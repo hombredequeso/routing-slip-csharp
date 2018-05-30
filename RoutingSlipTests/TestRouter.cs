@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hdq.Routingslip.Core;
-using Optional;
-using Optional.Collections;
 
 namespace RoutingSlipTests
 {
@@ -20,5 +17,6 @@ namespace RoutingSlipTests
             }
             return Task.CompletedTask;
         }
+
     }
 }
