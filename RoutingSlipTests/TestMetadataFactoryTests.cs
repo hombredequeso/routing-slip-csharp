@@ -5,7 +5,7 @@ using Xunit;
 
 namespace RoutingSlipTests
 {
-    public class TestCommandFactoryTests
+    public class TestMetadataFactoryTests
     {
         [Fact]
         public void NextMetadata_RemovesRoutingSlipHead()
@@ -17,9 +17,8 @@ namespace RoutingSlipTests
             var initialMetadata = new TestMetadata(id, initialRoutingSlip);
             var expectedMetadata = new TestMetadata(id, expectedRoutingSlip);
             
-            var result = TestCommandFactory.NextMetadata(initialRoutingSlip.First(), initialMetadata);
+            var result = TestMetadataFactory.NextMetadata(initialRoutingSlip.First(), initialMetadata);
             result.Should().BeEquivalentTo(expectedMetadata);
         }
-        
     }
 }
