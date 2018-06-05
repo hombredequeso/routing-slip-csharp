@@ -6,10 +6,10 @@ namespace RoutingSlipTests
 {
     public class TestRouter : IRouter<TestCommand, TestMetadata, string>
     {
-        public Tuple<ITransportCommand<TestCommand, TestMetadata, string>, string> Forwarded { get; private set; }
+        public Tuple<TransportCommand<TestCommand, TestMetadata, string>, string> Forwarded { get; private set; }
         
         public Task ForwardCommand(
-            ITransportCommand<TestCommand, TestMetadata, string> transportCommand)
+            TransportCommand<TestCommand, TestMetadata, string> transportCommand)
         {
             foreach (var route in transportCommand.Metadata.RoutingSlip.Head())
             {
@@ -22,10 +22,10 @@ namespace RoutingSlipTests
     
     public class Test2Router : IRouter<TestOutCommand, TestMetadata, string>
     {
-        public Tuple<ITransportCommand<TestOutCommand, TestMetadata, string>, string> Forwarded { get; private set; }
+        public Tuple<TransportCommand<TestOutCommand, TestMetadata, string>, string> Forwarded { get; private set; }
         
         public Task ForwardCommand(
-            ITransportCommand<TestOutCommand, TestMetadata, string> transportCommand)
+            TransportCommand<TestOutCommand, TestMetadata, string> transportCommand)
         {
             foreach (var route in transportCommand.Metadata.RoutingSlip.Head())
             {

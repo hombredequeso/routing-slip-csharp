@@ -2,9 +2,9 @@
 {
     public interface ICommandFactory<TCmd, TMetadata, TRoute> where TMetadata : IMetadata<TRoute>
     {
-        ITransportCommand<TCmd, TMetadata, TRoute> CloneWithoutThisRoute(
+        TransportCommand<TCmd, TMetadata, TRoute> CloneWithoutThisRoute(
             TRoute route,
-            ITransportCommand<TCmd, TMetadata, TRoute> cmd);
+            TransportCommand<TCmd, TMetadata, TRoute> cmd);
         
     }
 }

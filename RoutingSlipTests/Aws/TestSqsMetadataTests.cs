@@ -13,7 +13,7 @@ namespace RoutingSlipTests
         {
             return new JObject
             {
-                ["routingslip"] = new JArray(new[] {"route1", "route2"}),
+                ["routingslip"] = new JArray("route1", "route2"),
                 ["correlationId"] = Guid.NewGuid().ToString()
             };
         }

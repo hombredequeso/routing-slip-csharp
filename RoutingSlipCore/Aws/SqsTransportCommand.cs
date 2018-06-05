@@ -25,21 +25,6 @@ namespace Hdq.Routingslip.Core.Aws
         public List<string> RoutingSlip => _routingSlip.ToList();
     }
     
-    public class SqsTransportCommand
-        : ITransportCommand<TestSqsCommand, TestSqsMetadata, string>
-    {
-        public SqsTransportCommand(
-            TestSqsCommand domainCommand, 
-            TestSqsMetadata metadata)
-        {
-            DomainCommand = domainCommand;
-            Metadata = metadata;
-        }
-
-        public TestSqsCommand DomainCommand { get; }
-        public TestSqsMetadata Metadata { get; }
-    }
-
     public static class SqsTransportCommandFactory
     {
         public static List<string> ToList(JArray ja)
@@ -57,20 +42,6 @@ namespace Hdq.Routingslip.Core.Aws
             return new JArray(
                 from s in l
                 select new JValue(s));
-        }
-
-        public static SqsTransportCommand CloneWithPoppedRoute(
-            string thisRoute, 
-            SqsTransportCommand cmd)
-        {
-            JObject newMetadata = (JObject)cmd.Metadata.Metadata.DeepClone();
-            List<string> route = cmd.Metadata.RoutingSlip;
-            List<string> routeTail = route.Skip(1).ToList();
-            newMetadata["routingslip"] = ToJArray(routeTail);
-            var newmetadataObject = new TestSqsMetadata(newMetadata);
-            return new SqsTransportCommand(
-                cmd.DomainCommand, 
-                newmetadataObject);
         }
     }
 }

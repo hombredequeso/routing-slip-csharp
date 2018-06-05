@@ -11,11 +11,11 @@ namespace RoutingSlipTests
 {
     public static class TestFactory
     {
-        public static List<TestTransportCommand> GetTestCommands(int count)
+        public static List<TransportCommand<TestCommand, TestMetadata, string>> GetTestCommands(int count)
         {
             var routingSlip = new List<String> {"route1", "route2"};
             return Enumerable.Range(0, count)
-                .Select(i => new TestTransportCommand(
+                .Select(i => new TransportCommand<TestCommand, TestMetadata, string>(
                     new TestCommand(Guid.NewGuid()),
                     new TestMetadata(Guid.NewGuid(), routingSlip)))
                 .ToList();
@@ -27,10 +27,10 @@ namespace RoutingSlipTests
         [Fact]
         public async void WhenNoMessagesAvailable_GetNextMessage_ReturnsNothing()
         {
-            var testDataSource = new TestDataSource(new List<TestTransportCommand>());
+            var testDataSource = new TestDataSource(new List<TransportCommand<TestCommand, TestMetadata, string>>());
             var nextMessage = await testDataSource.GetNextTransportCommand();
 
-            nextMessage.Should().Be(Option.None<ITransportCommand<TestCommand, TestMetadata, string>>());
+            nextMessage.Should().Be(Option.None<TransportCommand<TestCommand, TestMetadata, string>>());
         }
 
         

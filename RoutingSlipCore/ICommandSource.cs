@@ -5,8 +5,8 @@ namespace Hdq.Routingslip.Core
 {
     public interface ICommandSource<TCmd, TMetadata, TRoute> where TMetadata : IMetadata<TRoute>
     {
-        Task<Option<ITransportCommand<TCmd, TMetadata, TRoute>>> GetNextTransportCommand();
-        Task<bool> AckTransportCommand(ITransportCommand<TCmd, TMetadata, TRoute> cmd);
+        Task<Option<TransportCommand<TCmd, TMetadata, TRoute>>> GetNextTransportCommand();
+        Task<bool> AckTransportCommand(TransportCommand<TCmd, TMetadata, TRoute> cmd);
         
     }
 }

@@ -6,33 +6,37 @@ namespace RoutingSlipTests
 {
     public class TestCommandFactory : ICommandFactory<TestCommand, TestMetadata, string>
     {
-        public ITransportCommand<TestCommand, TestMetadata, string> CloneWithoutThisRoute(string route, ITransportCommand<TestCommand, TestMetadata, string> cmd)
+        public TransportCommand<TestCommand, TestMetadata, string> CloneWithoutThisRoute(
+            string route, 
+            TransportCommand<TestCommand, TestMetadata, string> cmd)
         {
             return GetNext(route, cmd);
         }
         
-        public static ITransportCommand<TestCommand, TestMetadata, string> GetNext(
+        public static TransportCommand<TestCommand, TestMetadata, string> GetNext(
             string route,
-            ITransportCommand<TestCommand, TestMetadata, string> t)
+            TransportCommand<TestCommand, TestMetadata, string> t)
         {
-            return new TestTransportCommand(
-                t.DomainCommand, 
-                TestMetadataFactory.NextMetadata(route, t.Metadata));
+            TransportCommand<TestCommand, TestMetadata, string> transportCommand = 
+                new TransportCommand<TestCommand, TestMetadata, string>(
+                    t.DomainCommand, 
+                    TestMetadataFactory.NextMetadata(route, t.Metadata));
+            return transportCommand;
         }
     }
     
     public class Test2CommandFactory : ICommandFactory<TestOutCommand, TestMetadata, string>
     {
-        public ITransportCommand<TestOutCommand, TestMetadata, string> CloneWithoutThisRoute(
+        public TransportCommand<TestOutCommand, TestMetadata, string> CloneWithoutThisRoute(
             string route, 
-            ITransportCommand<TestOutCommand, TestMetadata, string> cmd)
+            TransportCommand<TestOutCommand, TestMetadata, string> cmd)
         {
             return GetNext(route, cmd);
         }
         
-        public static ITransportCommand<TestOutCommand, TestMetadata, string> GetNext(
+        public static TransportCommand<TestOutCommand, TestMetadata, string> GetNext(
             string route,
-            ITransportCommand<TestOutCommand, TestMetadata, string> t)
+            TransportCommand<TestOutCommand, TestMetadata, string> t)
         {
             return new TransportCommand<TestOutCommand, TestMetadata, string>(
                 t.DomainCommand, 

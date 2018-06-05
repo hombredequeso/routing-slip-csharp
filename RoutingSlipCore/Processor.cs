@@ -31,7 +31,7 @@ namespace Hdq.Routingslip.Core
             _commandFactory = commandFactory;
         }
 
-        public async Task<Option<Tuple<ITransportCommand<TCmd, TMetadata, TRoute>, TResult>>> Run()
+        public async Task<Option<Tuple<TransportCommand<TCmd, TMetadata, TRoute>, TResult>>> Run()
         {
             var sqsCommand = await _commandSource.GetNextTransportCommand();
             var result = await sqsCommand.MapAsync(ProcessCommand);
@@ -42,7 +42,7 @@ namespace Hdq.Routingslip.Core
                 select Tuple.Create(c, r);
         }
 
-        public async Task<TResult> ProcessCommand(ITransportCommand<TCmd, TMetadata, TRoute> cmd)
+        public async Task<TResult> ProcessCommand(TransportCommand<TCmd, TMetadata, TRoute> cmd)
         {
             var handlerResult = await _commandHandler.Handle(cmd);
             TResult result = handlerResult.Item1;

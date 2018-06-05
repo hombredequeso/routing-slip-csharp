@@ -32,7 +32,7 @@ namespace RoutingSlipTests
                     commandFactory);
                    
             // Act
-            Option<Tuple<ITransportCommand<TestCommand, TestMetadata, string>, TestResult>> result = 
+            Option<Tuple<TransportCommand<TestCommand, TestMetadata, string>, TestResult>> result = 
                 await processor.Run();
             
             // Assert
@@ -58,7 +58,7 @@ namespace RoutingSlipTests
         [Fact]
         public async void End_to_end_processor_test()
         {
-            List<TestTransportCommand> testTransportCommands = TestFactory.GetTestCommands(10);
+            var testTransportCommands = TestFactory.GetTestCommands(10);
             ICommandSource<TestCommand, TestMetadata, string> commandSource = 
                 new TestDataSource(testTransportCommands);
             ICommandHandler<TestCommand, TestCommand, TestMetadata, string, TestResult> commandHandler = 
@@ -78,7 +78,7 @@ namespace RoutingSlipTests
                     commandFactory);
                    
             // Act
-            Option<Tuple<ITransportCommand<TestCommand, TestMetadata, string>, TestResult>> result = 
+            Option<Tuple<TransportCommand<TestCommand, TestMetadata, string>, TestResult>> result = 
                 await processor.Run();
             
             // Assert

@@ -17,11 +17,10 @@ namespace RoutingSlipTests
         [InlineData("abc-*", false, "Only special characters allowed are dash")]
         [InlineData("1234", false, "must be at least 5 characters long")]
         [InlineData("12345", true, "5 characters is a valid length")]
-        [InlineData("12345", true, "5 characters is a valid length")]
         public void SqsRegexTests(string s, bool result, string becauseMessage)
         {
             new Regex(SqsRoute.lowercaseDigitsAndDashRegex).IsMatch(s)
-                .Should().Be(result);
+                .Should().Be(result, becauseMessage);
         }
 
         [Fact]

@@ -10,8 +10,8 @@ namespace RoutingSlipTests
 {
     public class TestDataSource : ICommandSource<TestCommand, TestMetadata, string>
     {
-        public readonly IDictionary<Guid, Tuple<TestTransportCommand, Boolean>> _commands;
-        public TestDataSource(IEnumerable<TestTransportCommand> cmds)
+        public readonly IDictionary<Guid, Tuple<TransportCommand<TestCommand, TestMetadata, string>, Boolean>> _commands;
+        public TestDataSource(IEnumerable<TransportCommand<TestCommand, TestMetadata, string>> cmds)
         {
             _commands = cmds
                 .Select(c => Tuple.Create(c, false))
@@ -19,21 +19,21 @@ namespace RoutingSlipTests
         }
 
 
-        public Task<Option<ITransportCommand<TestCommand, TestMetadata, string>>> 
+        public Task<Option<TransportCommand<TestCommand, TestMetadata, string>>> 
             GetNextTransportCommand()
         {
-            Option<ITransportCommand<TestCommand, TestMetadata, string>> nextCmd = 
+            Option<TransportCommand<TestCommand, TestMetadata, string>> nextCmd = 
                 _commands
                     .Where(c => !c.Value.Item2)
                     .Select(c => c.Value.Item1)
-                    .Cast<ITransportCommand<TestCommand, TestMetadata, string>>()
+                    .Cast<TransportCommand<TestCommand, TestMetadata, string>>()
                     .FirstOrNone();
 
             return Task.FromResult(nextCmd);
         }
 
         public Task<bool> AckTransportCommand(
-            ITransportCommand<TestCommand, TestMetadata, string> cmd)
+            TransportCommand<TestCommand, TestMetadata, string> cmd)
         {
             if (!_commands.ContainsKey(cmd.Metadata.CorrelationId)) return Task.FromResult(false);
             var x = _commands[cmd.Metadata.CorrelationId];
