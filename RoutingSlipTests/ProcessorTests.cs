@@ -34,20 +34,25 @@ namespace RoutingSlipTests
                 await processor.Run();
             
             // Assert
-            var firstCorrelationId = testTransportCommands.First().Metadata.CorrelationId;
-            result.ValueOrFailure().Item2.Should().BeEquivalentTo(
-                new TestResult(firstCorrelationId));
-            result.ValueOrFailure().Item1.Should().BeEquivalentTo(
-                testTransportCommands.First());
+            var processedTransportCommand = testTransportCommands.First();
             
-            resultProcessor.TestResult.Should().BeEquivalentTo(new TestResult(firstCorrelationId));
+            // Check processor.Run has returned the expected results.
+            var expectedResult = new TestResult(processedTransportCommand.Metadata.CorrelationId);
+            result.ValueOrFailure().Item2.Should().BeEquivalentTo(expectedResult);
+            result.ValueOrFailure().Item1.Should().BeEquivalentTo(processedTransportCommand);
+            
+            // Check the resultProcessor processed the expected result
+            resultProcessor.TestResult.Should().BeEquivalentTo(expectedResult);
 
+            // Check the router 
             var forwarded = router.Forwarded;
+            // - forwarded to the expected route.
             string forwardedroute = forwarded.Item2;
             forwardedroute.Should().BeEquivalentTo("route2");
 
+            // - Forwarded the expected command.
             var forwardedMessage = forwarded.Item1;
-            TestOutCommand expectedDomainCmd = new TestOutCommand(testTransportCommands.First().DomainCommand.Id);
+            TestOutCommand expectedDomainCmd = new TestOutCommand(processedTransportCommand.DomainCommand.Id);
             forwardedMessage.DomainCommand.Should().BeEquivalentTo(expectedDomainCmd);
             forwardedMessage.Should().BeOfType<TransportCommand<TestOutCommand, TestMetadata, string>>();
             // Need to test metadata here.

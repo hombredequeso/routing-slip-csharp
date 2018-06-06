@@ -35,8 +35,7 @@ namespace RoutingSlipTests
         
         private static 
             Func<TransportCommand<TestCommand, TestMetadata, string>, TransportCommand<TestCommand, TestMetadata, string>> 
-                ToNext(
-                    string currentRoute)
+                ToNext(string currentRoute)
         {
             return transportCommandIn =>
                   new TransportCommand<TestCommand, TestMetadata, string>(
@@ -48,9 +47,9 @@ namespace RoutingSlipTests
     
     public class TestRouter<TCmd> : IRouter<TCmd, TestMetadata, string>
     {
-        protected readonly string _currentRoute;
+        private readonly string _currentRoute;
 
-        public TestRouter(
+        protected TestRouter(
             string currentRoute,
             Func<TransportCommand<TCmd, TestMetadata, string>, TransportCommand<TCmd, TestMetadata, string>> next)
         {
