@@ -20,7 +20,7 @@ namespace RoutingSlipTests
             TestDataSource commandSource = new TestDataSource(testTransportCommands);
             TestCommandHandler commandHandler = new TestCommandHandler();
             TestResultProcessor resultProcessor = new TestResultProcessor();
-            TestRouter router = new TestRouter(currentRoute);
+            TestOutCommandRouter router = new TestOutCommandRouter(currentRoute);
 
             Processor<TestCommand, TestOutCommand, TestMetadata, string, TestResult> processor =
                 new Processor<TestCommand, TestOutCommand, TestMetadata, string, TestResult>(
@@ -62,7 +62,7 @@ namespace RoutingSlipTests
                 TestFactory.GetTestCommands(10);
             TestDataSource commandSource = new TestDataSource(testTransportCommands);
             TestCommandHandler commandHandler = new TestCommandHandler();
-            TestRouter router = new TestRouter(currentRoute);
+            TestOutCommandRouter router = new TestOutCommandRouter(currentRoute);
 
             Processor<TestCommand, TestOutCommand, TestMetadata, string, TestResult> processor =
                 new Processor<TestCommand, TestOutCommand, TestMetadata, string, TestResult>(
@@ -102,7 +102,7 @@ namespace RoutingSlipTests
                 TestFactory.GetTestCommands(10);
             TestDataSource commandSource = new TestDataSource(testTransportCommands);
             TestSameCommandInAndOurHandler commandHandler = new TestSameCommandInAndOurHandler();
-            TestRouter2 router = new TestRouter2(currentRoute);
+            TestCommandRouter router = new TestCommandRouter(currentRoute);
 
             Processor<TestCommand, TestCommand, TestMetadata, string, TestResult> processor =
                 new Processor<TestCommand, TestCommand, TestMetadata, string, TestResult>(
