@@ -48,7 +48,8 @@ namespace Hdq.Routingslip.Core
             TResult result = handlerResult.Item1;
             var nextCmd = handlerResult.Item2;
             await _resultProcessor.Process(result);
-            _router.ForwardCommand(_commandFactory.CloneWithoutThisRoute(_thisRoute, nextCmd));
+            var cloneWithoutThisRoute = _commandFactory.CloneWithoutThisRoute(_thisRoute, nextCmd);
+            _router.ForwardCommand(cloneWithoutThisRoute);
             return result;
         }
     }

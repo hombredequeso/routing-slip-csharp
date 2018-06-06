@@ -26,7 +26,6 @@ namespace RoutingSlipTests
                 _commands
                     .Where(c => !c.Value.Item2)
                     .Select(c => c.Value.Item1)
-                    .Cast<TransportCommand<TestCommand, TestMetadata, string>>()
                     .FirstOrNone();
 
             return Task.FromResult(nextCmd);

@@ -26,7 +26,6 @@ namespace RoutingSlipTests
 
             widget1.Should().BeEquivalentTo(widget1b);
             widget1.Should().Be(widget1);
-            // widget1.Should().Be(widget1b); fails
             widget1.Should().Equals(widget1b);
             widget1.Should().Equals(widget2);
         }
