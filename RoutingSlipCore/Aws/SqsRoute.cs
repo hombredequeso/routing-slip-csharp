@@ -3,8 +3,38 @@ using System.Text.RegularExpressions;
 
 namespace Hdq.Routingslip.Core.Aws
 {
-    public class SqsRoute
+    public class SqsRoute : IEquatable<SqsRoute>
     {
+        public bool Equals(SqsRoute other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(_queueName, other._queueName);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SqsRoute) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return _queueName.GetHashCode();
+        }
+
+        public static bool operator ==(SqsRoute left, SqsRoute right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(SqsRoute left, SqsRoute right)
+        {
+            return !Equals(left, right);
+        }
+
         private readonly string _queueName;
 
         private const int minLength = 5;

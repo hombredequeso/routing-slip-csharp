@@ -8,33 +8,36 @@ namespace Hdq.Routingslip.Core
     public class Processor<TCmd, TNextCmd, TMetadata, TRoute, TResult> 
         where TMetadata : IMetadata<TRoute>
     {
+        // A source of TransportCommands (consisting of TCmd and TMetadata, with a TRoute type)
         private readonly ICommandSource<TCmd, TMetadata, TRoute> _commandSource;
+        // Handler for a TCmd. It produces a TNextCmd (which could be the same type as a TCmd)
+        // to be passed on to the next route.
+        // It also produces a TResult, which could be an event to be raised.
         private readonly ICommandHandler<TCmd, TNextCmd, TMetadata, TRoute, TResult> _commandHandler;
-        private readonly IResultProcessor<TResult> _resultProcessor;
+        // Does something with the TResult
+        private readonly Option<IResultProcessor<TResult>> _resultProcessor;
+        // Router takes a TNextCmd and routes it on to the next handler.
+        // It is also responsible for popping the current route off the TMetadata.
         private readonly IRouter<TNextCmd, TMetadata, TRoute> _router;
-        private readonly TRoute _thisRoute;
-        private readonly ICommandFactory<TNextCmd, TMetadata, TRoute> _commandFactory;
 
         public Processor(
             ICommandSource<TCmd, TMetadata, TRoute> commandSource, 
             ICommandHandler<TCmd, TNextCmd, TMetadata, TRoute, TResult> commandHandler, 
-            IResultProcessor<TResult> resultProcessor, 
-            IRouter<TNextCmd, TMetadata, TRoute> router, 
-            TRoute thisRoute, 
-            ICommandFactory<TNextCmd, TMetadata, TRoute> commandFactory)
+            Option<IResultProcessor<TResult>> resultProcessor, 
+            IRouter<TNextCmd, TMetadata, TRoute> router)
         {
             _commandSource = commandSource;
             _commandHandler = commandHandler;
             _resultProcessor = resultProcessor;
             _router = router;
-            _thisRoute = thisRoute;
-            _commandFactory = commandFactory;
         }
 
+        // Get the next TransportCommand, process it, and pass it on the next route.
+        // If a command was processed, it returns the TransportCommand that was processed, and its TResult
         public async Task<Option<Tuple<TransportCommand<TCmd, TMetadata, TRoute>, TResult>>> Run()
         {
-            var sqsCommand = await _commandSource.GetNextTransportCommand();
-            var result = await sqsCommand.MapAsync(ProcessCommand);
+            Option<TransportCommand<TCmd, TMetadata, TRoute>> sqsCommand = await _commandSource.GetNextTransportCommand();
+            Option<TResult> result = await sqsCommand.MapAsync(ProcessCommand);
             await sqsCommand.MapAsync(_commandSource.AckTransportCommand);
 
             return from c in sqsCommand
@@ -42,14 +45,14 @@ namespace Hdq.Routingslip.Core
                 select Tuple.Create(c, r);
         }
 
-        public async Task<TResult> ProcessCommand(TransportCommand<TCmd, TMetadata, TRoute> cmd)
+        private async Task<TResult> ProcessCommand(TransportCommand<TCmd, TMetadata, TRoute> cmd)
         {
             var handlerResult = await _commandHandler.Handle(cmd);
-            TResult result = handlerResult.Item1;
-            var nextCmd = handlerResult.Item2;
-            await _resultProcessor.Process(result);
-            var cloneWithoutThisRoute = _commandFactory.CloneWithoutThisRoute(_thisRoute, nextCmd);
-            _router.ForwardCommand(cloneWithoutThisRoute);
+            var result = handlerResult.Item1;
+            var nextTransportCommand = handlerResult.Item2;
+            foreach (var processor in _resultProcessor)
+                await processor.Process(result);
+            await _router.ForwardCommand(nextTransportCommand);
             return result;
         }
     }

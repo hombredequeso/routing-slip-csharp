@@ -16,4 +16,16 @@ namespace RoutingSlipTests
             return Task.FromResult(Tuple.Create(testResult, nextCmd));
         }
     }
+    
+    
+    public class TestSameCommandInAndOurHandler : 
+        ICommandHandler<TestCommand, TestCommand, TestMetadata, string, TestResult>
+    {
+        public Task<Tuple<TestResult, TransportCommand<TestCommand, TestMetadata, string>>> Handle(
+            TransportCommand<TestCommand, TestMetadata, string> cmd)
+        {
+            var testResult = new TestResult(cmd.Metadata.CorrelationId);
+            return Task.FromResult(Tuple.Create(testResult, cmd));
+        }
+    }
 }

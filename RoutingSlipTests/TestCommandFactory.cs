@@ -6,18 +6,6 @@ using Hdq.Routingslip.Core;
 
 namespace RoutingSlipTests
 {
-    public class TestCommandFactory : ICommandFactory<TestOutCommand, TestMetadata, string>
-    {
-        public TransportCommand<TestOutCommand, TestMetadata, string> CloneWithoutThisRoute(
-            string route, 
-            TransportCommand<TestOutCommand, TestMetadata, string> cmd)
-        {
-            return new TransportCommand<TestOutCommand, TestMetadata, string>(
-                cmd.DomainCommand, 
-                TestMetadataFactory.NextMetadata(route, cmd.Metadata));
-        }
-    }
-
     public static class TestMetadataFactory
     {
         public static TestMetadata NextMetadata(
@@ -29,7 +17,7 @@ namespace RoutingSlipTests
                 NextRoute(route, t.RoutingSlip));
         }
 
-        public static List<TRoute> NextRoute<TRoute>(
+        private static List<TRoute> NextRoute<TRoute>(
             TRoute currentRoute, 
             List<TRoute> route) 
             where TRoute: IComparable<TRoute>
